@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FP_FirstPersonCharacter.h"
+
 #include "Animation/AnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -43,16 +44,6 @@ AFP_FirstPersonCharacter::AFP_FirstPersonCharacter()
 	FP_Gun->bCastDynamicShadow = false;		// Disallow mesh to cast dynamic shadows
 	FP_Gun->CastShadow = false;			// Disallow mesh to cast other shadows
 	FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
-
-	// Set weapon damage and range
-	WeaponRange = 5000.0f;
-	WeaponDamage = 500000.0f;
-
-	// Default offset from the character location for projectiles to spawn
-	GunOffset = FVector(100.0f, 30.0f, 10.0f);
-
-	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P are set in the
-	// derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -60,29 +51,25 @@ AFP_FirstPersonCharacter::AFP_FirstPersonCharacter()
 
 void AFP_FirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// set up gameplay key bindings
 	check(PlayerInputComponent);
-	
-	// Set up gameplay key bindings
 
-	// Bind jump events
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	
-	// Bind fire event
+	PlayerInputComponent->BindAction("RollDice", IE_Pressed, this, &AFP_FirstPersonCharacter::RollDice);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFP_FirstPersonCharacter::OnFire);
-	
-	// Bind movement events
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFP_FirstPersonCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFP_FirstPersonCharacter::MoveRight);
-	
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFP_FirstPersonCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFP_FirstPersonCharacter::LookUpAtRate);
+}
+
+void AFP_FirstPersonCharacter::RollDice()
+{
+	// Play UI roll dice animation
+
+
+	// Bullets count
+
+
+	// 
 }
 
 void AFP_FirstPersonCharacter::OnFire()
@@ -132,9 +119,16 @@ void AFP_FirstPersonCharacter::OnFire()
 	UPrimitiveComponent* DamagedComponent = Impact.GetComponent();
 
 	// If we hit an actor, with a component that is simulating physics, apply an impulse
-	if ((DamagedActor != nullptr) && (DamagedActor != this) && (DamagedComponent != nullptr) && DamagedComponent->IsSimulatingPhysics())
+	if ((DamagedActor != nullptr) &&
+		(DamagedActor != this) && 
+		(DamagedComponent != nullptr))
 	{
-		DamagedComponent->AddImpulseAtLocation(ShootDir * WeaponDamage, Impact.Location);
+		UGameplayStatics::ApplyDamage(DamagedActor, WeaponDamage, GetController(), this, UDamageType::StaticClass());
+
+		if (DamagedComponent->IsSimulatingPhysics())
+		{
+			DamagedComponent->AddImpulseAtLocation(ShootDir * WeaponDamage, Impact.Location);
+		}
 	}
 }
 

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "FP_FirstPersonCharacter.generated.h"
 
+class UMainGameWidget;
+
 class UInputComponent;
 class UCameraComponent;
 class USkeletalMeshComponent;
@@ -21,7 +23,20 @@ public:
 	AFP_FirstPersonCharacter();
 
 protected:
-	/** First person shooter members*/
+	/** Gameplay members */
+	/* This is when calculating the trace to determine what the weapon has hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float WeaponRange = 5000.0f;
+	
+	/* This is multiplied by the direction vector when the weapon trace hits something to apply velocity to the component that is hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float WeaponDamage = 500000.0f;
+
+	/** UI */
+	UPROPERTY(BlueprintReadWrite, Category = UI)
+	UMainGameWidget* GameUI = nullptr;
+
+	/** Meshes */
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(BlueprintReadWrite, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
@@ -30,7 +45,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = Mesh)
 	USkeletalMeshComponent* FP_Gun;
 
-	/** First person camera */
+	/** Cameras */
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
 	UCameraComponent* FirstPersonCameraComponent;
 
@@ -42,30 +57,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Camera)
 	float BaseLookUpRate;
 
-	/** Gun muzzle's offset from the characters location */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	FVector GunOffset;
-
 	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Sounds)
 	USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	UAnimMontage* FireAnimation;
 
-	/* This is when calculating the trace to determine what the weapon has hit */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float WeaponRange;
-	
-	/* This is multiplied by the direction vector when the weapon trace hits something to apply velocity to the component that is hit */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float WeaponDamage;
+public:
+	/** Roll a dice to get bullets count */
+	void RollDice();
 
-	/** Gameplay members */
-
-
-protected:
 	/** Fires a virtual projectile. */
 	void OnFire();
 
