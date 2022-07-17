@@ -21,9 +21,6 @@ class AFP_FirstPersonCharacter : public ACharacter
 
 	friend class UMainGameWidget;
 
-public:
-	AFP_FirstPersonCharacter();
-
 protected:
 	/** Gameplay members */
 	/* This is when calculating the trace to determine what the weapon has hit */
@@ -37,6 +34,9 @@ protected:
 	/** Health Value. Dead if less or equal to 0 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	float Health = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Score = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 RollCount = 3;
@@ -83,6 +83,12 @@ protected:
 	UAnimMontage* FireAnimation;
 
 public:
+	AFP_FirstPersonCharacter();
+
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override final;
+
+	void OnEliminateEnemy(int32 ScoreToAdd) { Score += ScoreToAdd; }
+
 	/** Roll a dice to get bullets count */
 	void RollDice();
 

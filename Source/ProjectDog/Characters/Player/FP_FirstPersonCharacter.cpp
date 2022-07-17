@@ -47,8 +47,17 @@ AFP_FirstPersonCharacter::AFP_FirstPersonCharacter()
 	FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
+float AFP_FirstPersonCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Health -= DamageAmount;
+
+	if (Health <= 0.0f)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Level_Menu");
+	}
+
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
 
 void AFP_FirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -64,28 +73,27 @@ void AFP_FirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 void AFP_FirstPersonCharacter::RollDice()
 {
+	// Cooldown
 	static bool InCooldown = false;
 	if (InCooldown)
 	{
 		return;
 	}
-	
-	const int32 DiceResult = FMath::RandRange(1, 6);
 
-	// Play UI roll dice animation
-	GameUI->RollDice(DiceResult);
-
-	// AmmoCount count
-	AmmoCount = DiceResult;
-	GameUI->SetAmmoCount(AmmoCount);
-
-	// Cooldown
 	FTimerHandle Handle;
 	InCooldown = true;
-	GetWorld()->GetTimerManager().SetTimer(Handle, []() 
+	GetWorld()->GetTimerManager().SetTimer(Handle, []()
 		{
 			InCooldown = false;
 		}, RollDiceCooldownSeconds, false);
+
+	// Roll a dice to set ammo
+	const int32 DiceResult = FMath::RandRange(1, 6);
+	AmmoCount = DiceResult;
+
+	// UI
+	GameUI->RollDice(DiceResult);
+	GameUI->SetAmmoCount(AmmoCount);
 }
 
 void AFP_FirstPersonCharacter::OnFire()

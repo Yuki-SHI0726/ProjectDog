@@ -25,10 +25,14 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
 	UImage* Ammo_Image = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
+	UImage* HealthBar_Image = nullptr;
 	
 public:
 	virtual void NativeConstruct() override final;
 
 	void SetAmmoCount(int32 AmmoCount);
+	void SetHealth(float Health);
 	void RollDice(int32 DiceResult);
 };

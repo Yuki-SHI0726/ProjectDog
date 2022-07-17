@@ -2,6 +2,8 @@
 
 
 #include "Actors/Enemies/EnemyProjectile.h"
+#include "Characters/Player/FP_FirstPersonCharacter.h"
+#include "Actors/Triggers/ProjectileHandlerTriggerBox.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,7 +11,7 @@
 AEnemyProjectile::AEnemyProjectile()
 {
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	StaticMeshComponent->OnComponentHit.AddDynamic(this, &AEnemyProjectile::OnHit);		
+	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyProjectile::OnBeginOverlap);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
 	ProjectileMovement->UpdatedComponent = StaticMeshComponent;
@@ -29,12 +31,24 @@ float AEnemyProjectile::TakeDamage(float DamageAmount, const FDamageEvent& Damag
 	// If Dead
 	if (Health <= 0.0f)
 	{
+		// Player gain score
+		if (AFP_FirstPersonCharacter* Player = Cast<AFP_FirstPersonCharacter>(DamageCauser))
+		{
+			Player->OnEliminateEnemy(Score);
+		}
 		GetWorld()->DestroyActor(this);
 	}
 
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AEnemyProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (AProjectileHandlerTriggerBox* ProjectileHandlerTriggerBox = Cast<AProjectileHandlerTriggerBox>(OtherActor))
+	{
+		AFP_FirstPersonCharacter* const Player = GetWorld()->GetFirstPlayerController()->GetPawn<AFP_FirstPersonCharacter>();
+		UGameplayStatics::ApplyDamage(Player, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
+
+		GetWorld()->DestroyActor(this);
+	}
 }

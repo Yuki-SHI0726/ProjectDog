@@ -12,7 +12,11 @@ void UMainGameWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	AFP_FirstPersonCharacter* Player = Cast<AFP_FirstPersonCharacter>(GetOwningPlayerPawn());
-	AmmoCount_TextBlock->SetText(FText::AsNumber(Player->AmmoCount));
+
+	if (Player)
+	{
+		AmmoCount_TextBlock->SetText(FText::AsNumber(Player->AmmoCount));
+	}
 }
 
 void UMainGameWidget::SetAmmoCount(int32 AmmoCount)
@@ -27,6 +31,10 @@ void UMainGameWidget::SetAmmoCount(int32 AmmoCount)
 	{
 		Ammo_Image->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void UMainGameWidget::SetHealth(float Health)
+{
 }
 
 void UMainGameWidget::RollDice(int32 DiceResult)
