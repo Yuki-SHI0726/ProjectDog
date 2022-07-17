@@ -35,11 +35,15 @@ private:
 
 	FVector2D HealthBar_ImageOrigin;
 	
+	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
+	UTextBlock* Score_TextBlock = nullptr;
+
 public:
 	virtual void NativeConstruct() override final;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override final;
 
 	void SetAmmoCount(int32 AmmoCount);
 	void SetHealth(float HealthPercent);
+	void SetScore(int32 Score);
 	void RollDice(int32 DiceResult);
 };

@@ -36,6 +36,12 @@ float APlayerPawn::TakeDamage(float DamageAmount, const FDamageEvent& DamageEven
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
+void APlayerPawn::OnEliminateEnemy(int32 ScoreToAdd)
+{
+	Score += ScoreToAdd;
+	GameUI->SetScore(Score);
+}
+
 void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	check(PlayerInputComponent);

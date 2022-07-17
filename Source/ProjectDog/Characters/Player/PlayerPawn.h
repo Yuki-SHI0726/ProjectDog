@@ -70,7 +70,7 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override final;
 
-	void OnEliminateEnemy(int32 ScoreToAdd) { Score += ScoreToAdd; }
+	void OnEliminateEnemy(int32 ScoreToAdd);
 
 	/** Roll a dice to get bullets count */
 	void RollDice();

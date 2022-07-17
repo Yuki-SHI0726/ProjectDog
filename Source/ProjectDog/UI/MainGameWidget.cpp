@@ -23,6 +23,7 @@ void UMainGameWidget::NativeConstruct()
 	{
 		SetAmmoCount(Player->AmmoCount);
 		SetHealth(Player->Health / 100.0f);
+		SetScore(Player->Score);
 	}
 }
 
@@ -61,4 +62,9 @@ void UMainGameWidget::SetHealth(float HealthPercent)
 
 void UMainGameWidget::RollDice(int32 DiceResult)
 {
+}
+
+void UMainGameWidget::SetScore(int32 Score)
+{
+	Score_TextBlock->SetText(FText::AsNumber(Score));
 }
