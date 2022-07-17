@@ -24,10 +24,10 @@ AEnemyProjectile::AEnemyProjectile()
 
 float AEnemyProjectile::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Life -= DamageAmount;
+	Health -= DamageAmount;
 
 	// If Dead
-	if (Life <= 0.0f)
+	if (Health <= 0.0f)
 	{
 		GetWorld()->DestroyActor(this);
 	}

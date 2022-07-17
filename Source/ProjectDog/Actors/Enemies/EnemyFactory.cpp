@@ -9,6 +9,31 @@
 
 AEnemyFactory::AEnemyFactory()
 {
+	FindAllEnemyProjectileBlueprints();
+}
+
+void AEnemyFactory::BeginPlay()
+{
+	Super::BeginPlay();
+
+	/** Spawn enemy projectiles timer */
+	FTimerHandle SpawnEnemyHandle;
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUFunction(this, "SpawnEnemy");
+	GetWorld()->GetTimerManager().SetTimer(SpawnEnemyHandle, TimerDelegate, SpawnCooldownSeconds, true);
+}
+
+void AEnemyFactory::SpawnEnemy()
+{
+	const int32 RandomIndex = FMath::RandRange(0, Projectiles.Num() - 1);
+	UClass* RandomProjectile = Projectiles[RandomIndex];
+	GetWorld()->SpawnActor<AEnemyProjectile>(RandomProjectile, GetActorLocation(), GetActorRotation());
+
+	GEngine->AddOnScreenDebugMessage(-1, SpawnCooldownSeconds, FColor::Cyan, "Spawned a " + RandomProjectile->GetName());
+}
+
+void AEnemyFactory::FindAllEnemyProjectileBlueprints()
+{
 	// Load the derived NPC blueprints from memory
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry"));
 	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
@@ -55,21 +80,4 @@ AEnemyFactory::AEnemyFactory()
 			}
 		}
 	}
-}
-
-void AEnemyFactory::BeginPlay()
-{
-	Super::BeginPlay();
-
-	TimerDelegate.BindUFunction(this, "SpawnEnemy");
-	GetWorld()->GetTimerManager().SetTimer(SpawnEnemyHandle, TimerDelegate, SpawnCooldownSeconds, true);
-}
-
-void AEnemyFactory::SpawnEnemy()
-{
-	const int32 RandomIndex = FMath::RandRange(0, Projectiles.Num() - 1);
-	UClass* RandomProjectile = Projectiles[RandomIndex];
-	GetWorld()->SpawnActor<AEnemyProjectile>(RandomProjectile, GetActorLocation(), GetActorRotation());
-
-	GEngine->AddOnScreenDebugMessage(-1, SpawnCooldownSeconds, FColor::Cyan, "Spawned a " + RandomProjectile->GetName());
 }
