@@ -25,14 +25,15 @@ private:
 	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = true))
 	TArray<UClass*> Projectiles;
 
-	FTimerHandle SpawnEnemyHandle;
-	FTimerDelegate TimerDelegate;
-
 public:	
 	AEnemyFactory();
 
 	virtual void BeginPlay() override final;
 
+	/** Spawns a random enemy projectile Blueprint */
 	UFUNCTION()
 	void SpawnEnemy();
+
+private:
+	void FindAllEnemyProjectileBlueprints();
 };

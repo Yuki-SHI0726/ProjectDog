@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FP_FirstPersonCharacter.h"
+#include "UI/MainGameWidget.h"
 
 #include "Animation/AnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -63,17 +64,42 @@ void AFP_FirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 void AFP_FirstPersonCharacter::RollDice()
 {
+	static bool InCooldown = false;
+	if (InCooldown)
+	{
+		return;
+	}
+	
+	const int32 DiceResult = FMath::RandRange(1, 6);
+
 	// Play UI roll dice animation
+	GameUI->RollDice(DiceResult);
 
+	// AmmoCount count
+	AmmoCount = DiceResult;
+	GameUI->SetAmmoCount(AmmoCount);
 
-	// Bullets count
-
-
-	// 
+	// Cooldown
+	FTimerHandle Handle;
+	InCooldown = true;
+	GetWorld()->GetTimerManager().SetTimer(Handle, []() 
+		{
+			InCooldown = false;
+		}, RollDiceCooldownSeconds, false);
 }
 
 void AFP_FirstPersonCharacter::OnFire()
 {
+	// Exit if no bullets
+	if (AmmoCount <= 0)
+	{
+		return;
+	}
+
+	// Reduce bullets and notify UI
+	--AmmoCount;
+	GameUI->SetAmmoCount(AmmoCount);
+
 	// Play a sound if there is one
 	if (FireSound != nullptr)
 	{

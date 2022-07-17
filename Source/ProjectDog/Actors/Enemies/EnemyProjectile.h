@@ -24,7 +24,7 @@ protected:
 	UProjectileMovementComponent* ProjectileMovement = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = true))
-	float Life = 2;
+	float Health = 2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = true))
 	float Damage = 5;

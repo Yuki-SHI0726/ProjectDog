@@ -19,6 +19,8 @@ class AFP_FirstPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	friend class UMainGameWidget;
+
 public:
 	AFP_FirstPersonCharacter();
 
@@ -30,7 +32,22 @@ protected:
 	
 	/* This is multiplied by the direction vector when the weapon trace hits something to apply velocity to the component that is hit */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float WeaponDamage = 500000.0f;
+	float WeaponDamage = 3.0f;
+
+	/** Health Value. Dead if less or equal to 0 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float Health = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 RollCount = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float RollDiceCooldownSeconds = 5.0f;
+
+	TQueue<int32> RecentDiceResults;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 AmmoCount = 0;
 
 	/** UI */
 	UPROPERTY(BlueprintReadWrite, Category = UI)
