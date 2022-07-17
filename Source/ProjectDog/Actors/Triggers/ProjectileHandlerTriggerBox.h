@@ -13,4 +13,5 @@ UCLASS()
 class PROJECTDOG_API AProjectileHandlerTriggerBox : public ATriggerBox
 {
 	GENERATED_BODY()
+
 };

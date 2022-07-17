@@ -2,21 +2,36 @@
 
 
 #include "UI/MainGameWidget.h"
-#include "Characters/Player/FP_FirstPersonCharacter.h"
+#include "Characters/Player/PlayerPawn.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/CanvasPanelSlot.h"
 
 void UMainGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AFP_FirstPersonCharacter* Player = Cast<AFP_FirstPersonCharacter>(GetOwningPlayerPawn());
+	UCanvasPanelSlot* HealthBar_ImageCanvasPanelSlot = Cast<UCanvasPanelSlot>(HealthBar_Image->Slot);
+	const FMargin HealthBar_ImageOriginMargin = HealthBar_ImageCanvasPanelSlot->GetOffsets();
+	HealthBar_ImageOrigin.X = HealthBar_ImageOriginMargin.Top;
+	HealthBar_ImageOrigin.Y = HealthBar_ImageOriginMargin.Bottom;
 
+	APlayerPawn* Player = Cast<APlayerPawn>(GetOwningPlayerPawn());
 	if (Player)
 	{
-		AmmoCount_TextBlock->SetText(FText::AsNumber(Player->AmmoCount));
+		SetAmmoCount(Player->AmmoCount);
+		SetHealth(Player->Health / 100.0f);
 	}
+}
+
+void UMainGameWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	FVector2D MousePositionOnViewport = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+
+	UCanvasPanelSlot* CrossHair_ImageCanvasPanelSlot = Cast<UCanvasPanelSlot>(CrossHair_Image->Slot);
+	CrossHair_ImageCanvasPanelSlot->SetPosition(MousePositionOnViewport);
 }
 
 void UMainGameWidget::SetAmmoCount(int32 AmmoCount)
@@ -33,8 +48,15 @@ void UMainGameWidget::SetAmmoCount(int32 AmmoCount)
 	}
 }
 
-void UMainGameWidget::SetHealth(float Health)
+void UMainGameWidget::SetHealth(float HealthPercent)
 {
+	UCanvasPanelSlot* HealthBar_ImageCanvasPanelSlot = Cast<UCanvasPanelSlot>(HealthBar_Image->Slot);
+	FMargin HealthBar_ImageMargin = HealthBar_ImageCanvasPanelSlot->GetOffsets();
+
+	HealthBar_ImageMargin.Top = HealthBar_ImageOrigin.X * HealthPercent;
+	HealthBar_ImageMargin.Bottom = HealthBar_ImageOrigin.Y * HealthPercent;
+
+	HealthBar_ImageCanvasPanelSlot->SetOffsets(HealthBar_ImageMargin);
 }
 
 void UMainGameWidget::RollDice(int32 DiceResult)

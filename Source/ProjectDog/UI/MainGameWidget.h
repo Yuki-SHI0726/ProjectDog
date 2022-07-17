@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainGameWidget.generated.h"
 
-class AFP_FirstPersonCharacter;
+class APlayerPawn;
 
 class UTextBlock;
 class UImage;
@@ -20,6 +20,10 @@ class PROJECTDOG_API UMainGameWidget : public UUserWidget
 	GENERATED_BODY()
 
 private:
+	/** CrossHair indicating shooting direction, always follows the mouse cursor */
+	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
+	UImage* CrossHair_Image = nullptr;
+
 	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
 	UTextBlock* AmmoCount_TextBlock = nullptr;
 
@@ -28,11 +32,14 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (BindWidget, AllowPrivateAccess = true))
 	UImage* HealthBar_Image = nullptr;
+
+	FVector2D HealthBar_ImageOrigin;
 	
 public:
 	virtual void NativeConstruct() override final;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override final;
 
 	void SetAmmoCount(int32 AmmoCount);
-	void SetHealth(float Health);
+	void SetHealth(float HealthPercent);
 	void RollDice(int32 DiceResult);
 };

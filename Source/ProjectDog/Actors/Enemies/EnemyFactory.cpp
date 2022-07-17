@@ -3,7 +3,11 @@
 
 #include "Actors/Enemies/EnemyFactory.h"
 #include "Actors/Enemies/EnemyProjectile.h"
+#include "Actors/Triggers/ProjectileHandlerTriggerBox.h"
 
+#include "Components/BoxComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
@@ -16,6 +20,8 @@ void AEnemyFactory::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ProjectileHandlerTriggerBox = Cast<AProjectileHandlerTriggerBox>(UGameplayStatics::GetActorOfClass(GetWorld(), AProjectileHandlerTriggerBox::StaticClass()));
+
 	/** Spawn enemy projectiles timer */
 	FTimerHandle SpawnEnemyHandle;
 	FTimerDelegate TimerDelegate;
@@ -25,11 +31,19 @@ void AEnemyFactory::BeginPlay()
 
 void AEnemyFactory::SpawnEnemy()
 {
+	// Look at random location towards to the trigger box
+	UBoxComponent* BoxComponent = Cast<UBoxComponent>(ProjectileHandlerTriggerBox->GetCollisionComponent());
+	if (BoxComponent)
+	{
+		const FVector RandomPoint = UKismetMathLibrary::RandomPointInBoundingBox(ProjectileHandlerTriggerBox->GetActorLocation(), BoxComponent->GetScaledBoxExtent());
+		const FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), RandomPoint);
+		SetActorRotation(NewRotation);
+	}
+
+	// Spawn a random projectile at factory's rotation location
 	const int32 RandomIndex = FMath::RandRange(0, Projectiles.Num() - 1);
 	UClass* RandomProjectile = Projectiles[RandomIndex];
 	GetWorld()->SpawnActor<AEnemyProjectile>(RandomProjectile, GetActorLocation(), GetActorRotation());
-
-	GEngine->AddOnScreenDebugMessage(-1, SpawnCooldownSeconds, FColor::Cyan, "Spawned a " + RandomProjectile->GetName());
 }
 
 void AEnemyFactory::FindAllEnemyProjectileBlueprints()

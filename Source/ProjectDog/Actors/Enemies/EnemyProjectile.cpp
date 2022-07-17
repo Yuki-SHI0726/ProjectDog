@@ -2,10 +2,11 @@
 
 
 #include "Actors/Enemies/EnemyProjectile.h"
-#include "Characters/Player/FP_FirstPersonCharacter.h"
+#include "Characters/Player/PlayerPawn.h"
 #include "Actors/Triggers/ProjectileHandlerTriggerBox.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
 
 AEnemyProjectile::AEnemyProjectile()
@@ -32,7 +33,7 @@ float AEnemyProjectile::TakeDamage(float DamageAmount, const FDamageEvent& Damag
 	if (Health <= 0.0f)
 	{
 		// Player gain score
-		if (AFP_FirstPersonCharacter* Player = Cast<AFP_FirstPersonCharacter>(DamageCauser))
+		if (APlayerPawn* Player = Cast<APlayerPawn>(DamageCauser))
 		{
 			Player->OnEliminateEnemy(Score);
 		}
@@ -46,7 +47,7 @@ void AEnemyProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	if (AProjectileHandlerTriggerBox* ProjectileHandlerTriggerBox = Cast<AProjectileHandlerTriggerBox>(OtherActor))
 	{
-		AFP_FirstPersonCharacter* const Player = GetWorld()->GetFirstPlayerController()->GetPawn<AFP_FirstPersonCharacter>();
+		APlayerPawn* const Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayerPawn>();
 		UGameplayStatics::ApplyDamage(Player, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
 
 		GetWorld()->DestroyActor(this);

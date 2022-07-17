@@ -7,6 +7,7 @@
 #include "EnemyFactory.generated.h"
 
 class AEnemyProjectile;
+class AProjectileHandlerTriggerBox;
 
 /**
  * Spawns different enemy projectiles from time to time randomly at this factory actors's location and rotation
@@ -24,6 +25,8 @@ private:
 	/** Stores enemy projectiles for spawning. Initialized during BeginPlay() */
 	UPROPERTY(BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = true))
 	TArray<UClass*> Projectiles;
+
+	AProjectileHandlerTriggerBox* ProjectileHandlerTriggerBox;
 
 public:	
 	AEnemyFactory();
